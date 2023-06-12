@@ -9,4 +9,4 @@ UDPServer: UDPServer.c
 	gcc UDPServer.c -o UDPServer
 	
 delete: 
-	rm UDPServer UDPClientWrite UDPClientRead
+	rm UDPServer UDPClientWrite UDPClientRead UDPClientVisit
