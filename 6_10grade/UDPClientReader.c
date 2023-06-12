@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
                 if (tries < MAXTRIES) /* incremented by signal handler */
                 {
                     printf("timed out, %d more tries...\n", MAXTRIES - tries);
-                    if (sendto(sock, result, sizeof(result), 0, (struct sockaddr *)&echoServAddr, sizeof(echoServAddr)) != sizeof(result))
+                    if (sendto(sock, numbers, sizeof(numbers), 0, (struct sockaddr *)&echoServAddr, sizeof(echoServAddr)) != sizeof(numbers))
                         perror("sendto() failed");
                     alarm(TIMEOUT_SECS);
                 }

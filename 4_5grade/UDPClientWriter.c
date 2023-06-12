@@ -1,4 +1,13 @@
 #include "GeneralData.h"
+#define ECHOMAX 255    /* Longest string to echo */
+#define TIMEOUT_SECS 2 /* Seconds between retransmits */
+#define MAXTRIES 5     /* Tries before giving up */
+
+int tries = 0; /* Count of times sent - GLOBAL for signal-handler access */
+
+int sock; /* Socket descriptor */
+
+void CatchAlarm(int ignored); /* Handler for SIGALRM */
 
 int sock; /* Socket descriptor */
 void my_handler(int nsig)
@@ -69,10 +78,27 @@ int main(int argc, char *argv[])
 
         /* Recv a response */
         fromSize = sizeof(fromAddr);
-        if ((respStringLen = recvfrom(sock, result, sizeof(result), 0,
-                                      (struct sockaddr *)&fromAddr, &fromSize)) != sizeof(result))
-            perror("recvfrom() failed");
 
+        alarm(TIMEOUT_SECS); /* Set the timeout */
+        while ((respStringLen = recvfrom(sock, result, sizeof(result), 0,
+                                         (struct sockaddr *)&fromAddr, &fromSize)) != sizeof(numbers))
+            if (errno == EINTR) /* Alarm went off  */
+            {
+                if (tries < MAXTRIES) /* incremented by signal handler */
+                {
+                    printf("timed out, %d more tries...\n", MAXTRIES - tries);
+                    if (sendto(sock, numbers, sizeof(numbers), 0, (struct sockaddr *)&echoServAddr, sizeof(echoServAddr)) != sizeof(numbers))
+                        perror("sendto() failed");
+                    alarm(TIMEOUT_SECS);
+                }
+                else
+                    perror("No Response");
+            }
+            else
+                perror("recvfrom() failed");
+
+        /* recvfrom() got something --  cancel the timeout */
+        alarm(0);
         printf("Writer: Process %d successfully write data from index %d: %d\n", i, result[1], result[2]);
         printf("\n"); /* Print a final linefeed */
         sleep(1);
