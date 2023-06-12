@@ -70,12 +70,6 @@ int main(int argc, char *argv[])
                                       (struct sockaddr *)&fromAddr, &fromSize)) != sizeof(numbers))
             perror("recvfrom() failed");
 
-        // if (echoServAddr.sin_addr.s_addr != fromAddr.sin_addr.s_addr)
-        // {
-        //     fprintf(stderr, "Error: received a packet from unknown source.\n");
-        //     exit(1);
-        // }
-
         printf("Reader: Process %d successfully read data from index %d: %d\n", i, result[1], result[2]);
         printf("\n"); /* Print a final linefeed */
         sleep(1);
